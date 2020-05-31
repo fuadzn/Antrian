@@ -5,6 +5,9 @@
  */
 package antrian;
 
+import static antrian.constant.Constant.*;
+import antrian.listener.BaseActivity;
+import antrian.presenter.AntrianServicePresenter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -17,12 +20,16 @@ import javax.swing.JOptionPane;
  *
  * @author fuadz
  */
-public class teller extends javax.swing.JFrame {
+public class teller extends javax.swing.JFrame implements BaseActivity {
 
     Connection conn = null;
     PreparedStatement pst =null;
     ResultSet rs = null;
     Queue<Object> antrian = new LinkedList<>();
+    
+    AntrianServicePresenter presenter = new AntrianServicePresenter();
+    
+    View page;
     /**
      * Creates new form View
      */
@@ -30,7 +37,7 @@ public class teller extends javax.swing.JFrame {
     public teller() {
         initComponents();
         
-        conn = View.ConnectDB();
+        
     }
     
     private void prosesAntrian(){
@@ -58,6 +65,8 @@ public class teller extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        number = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -70,21 +79,41 @@ public class teller extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("Teller No");
+
+        number.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        number.setForeground(new java.awt.Color(255, 255, 255));
+        number.setText("0");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(76, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(66, 66, 66))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(71, 71, 71)
+                        .addComponent(jButton1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(116, 116, 116)
+                        .addComponent(number))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(95, 95, 95)
+                        .addComponent(jLabel1)))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(53, 53, 53)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(number)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addComponent(jButton1)
-                .addContainerGap(68, Short.MAX_VALUE))
+                .addGap(35, 35, 35))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -103,7 +132,10 @@ public class teller extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        prosesAntrian();
+         presenter.insert(TABLE_TELLER);
+        
+        update();
+        page.updateLabel();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     public static Connection ConnectDB()
@@ -156,6 +188,26 @@ public class teller extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel number;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void getConnection(Connection conn) {
+        presenter.setConnection(conn);
+        
+        update();
+        
+    }
+    
+    public void update() {
+        presenter.select(TABLE_TELLER);
+        
+        number.setText(presenter.getCode());
+    }
+    
+    public void setView(View page) {
+        this.page = page;
+    }
 }
